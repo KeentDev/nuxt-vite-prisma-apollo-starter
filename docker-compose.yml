@@ -1,0 +1,35 @@
+version: "3"
+services:
+  db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASS}
+      POSTGRES_DB: ${PG_DB}
+    volumes:
+      - ./starter-backend/pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    expose:
+      - 5432
+  backend:
+    build: starter-backend/
+    command: npm run start
+    volumes:
+      - ./starter-backend:/usr/app/
+      - /usr/app/node_modules
+    ports:
+      - '4000:4000'
+    depends_on:
+      - db
+  frontend:
+    build: starter-frontend/
+    command: npm run dev
+    volumes: 
+      - ./starter-frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3000:3000'
+      - '24678:24678'
+    depends_on:
+      - backend
